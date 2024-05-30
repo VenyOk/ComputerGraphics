@@ -67,7 +67,7 @@ def getnorm(a, b, c):
 
 def drawsq():
     global size, delta_x, delta_y, delta_z
-    '''global speed
+    global speed
     delta_x += speed * direction[0]
     delta_y += speed * direction[1]
     delta_z += speed * direction[2]
@@ -79,7 +79,7 @@ def drawsq():
     if abs(delta_z) >= 1:
         direction[2] = -direction[2]
     else:
-        speed -= 0.0005 * direction[1]'''
+        speed -= 0.0005 * direction[1]
     global vertices, normals, indices, display_list
 
     display_list = glGenLists(1)
@@ -112,41 +112,8 @@ def drawsq():
         glEnd()
     glEndList()
 
-vertices = []
 
 
-def create_vbo():
-    global vbo
-
-    for j in range(1, n):
-        i = 0
-        while i <= 2 * math.pi:
-            m = size - j / n * size
-            m_pred = size - (j - 1) / n * size
-            x = m * math.cos(i) * math.cos(j / n) + delta_x
-            x_pred = m_pred * math.cos(i) * math.cos((j - 1) / n) + delta_x
-            y = m * math.sin(i) * math.cos(j / n) + delta_y
-            y_pred = m_pred * math.sin(i) * math.cos((j - 1) / n) + delta_y
-            z = j / n + delta_z
-            z_pred = (j - 1) / n + delta_z
-            norm = getnorm([x_pred, y_pred, (j - 1 / n)], [x, y, j / n],
-                           [m * math.cos(i + math.pi / 2) * math.cos(j / n),
-                            m * math.sin(i + math.pi / 2) * math.cos(j / n), j / n])
-            glNormal3d(norm[0], norm[1], norm[2])
-            vertices.extend([x, y, z])
-            vertices.extend([x_pred, y_pred, z_pred])
-            i += math.pi / 2
-    vbo = glGenBuffers(1)
-    glBindBuffer(GL_ARRAY_BUFFER, vbo)
-    glBufferData(GL_ARRAY_BUFFER, np.array(vertices, dtype=np.float32), GL_STATIC_DRAW)
-
-
-def draw_with_vbo():
-    glBindBuffer(GL_ARRAY_BUFFER, vbo)
-    glEnableClientState(GL_VERTEX_ARRAY)
-    glVertexPointer(3, GL_FLOAT, 0, None)
-    glDrawArrays(GL_QUAD_STRIP, 0, int(len(vertices) / 2))
-    glDisableClientState(GL_VERTEX_ARRAY)
 
 def display(window):
     global size, delta_x, delta_y, delta_z, display_list
@@ -186,7 +153,6 @@ def display(window):
 
     glEnd()
     glCallList(display_list)
-    draw_with_vbo()
     glDisable(GL_TEXTURE_2D)
     if flag:
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)
@@ -253,7 +219,6 @@ def main():
     glBindTexture(GL_TEXTURE_2D, 0)
 
     drawsq()
-    create_vbo()
     while not glfw.window_should_close(window):
         glfw.poll_events()
         display(window)
